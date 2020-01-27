@@ -1,0 +1,193 @@
+---
+title: "Scatter plot and Data table visualization"
+author: "Ganesh kumar"
+date: "1/25/2020"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+### Introduction:
+
+The given data consists of three columns country, var_a and var_b. The assignment is to make a scatter plot from this data which is comprehensible and visually appealing. Also, statistics like corelation, mean and standard deviation associated with each country is calculated and a data table is made from this. Lastly, the information represented by these two visualizations are compared.
+
+### Scatterplot:
+
+```{r fig.align='center'}
+library(ggplot2)
+#Read the giveb csv file
+data <- read.csv('.data/week2_data_4cat.csv')
+#Data and aesthetic layers, aesthetic mapping
+graph <-
+  ggplot(data,
+         aes(
+           x = var_a,
+           y = var_b,
+           colour = country,
+           shape = country,
+           alpha = country
+         )) +
+  
+  #made the points bigger using size and bolder using stroke
+  geom_point(size = 2, stroke = 0.8) +
+  
+  #Assigned colours,alpha and shapes manually
+  scale_colour_manual(values = c('red', 'darkgreen', 'mediumblue', 'deeppink4')) +
+  scale_alpha_manual(values = c(0.8, 1, 0.6, 0.8)) +
+  scale_shape_manual(values = c(2, 0, 8, 1)) +
+  
+  #Given plot title and changed default axis labels
+  ggtitle('Performance of countries') +
+  xlab('a values') +
+  ylab('b values') +
+  
+  #Changing default breaks to make it comprehensible and visually appealing
+  scale_x_continuous(breaks = c(6, 10, 14, 18)) +
+  
+  #Adding theme layer to change the graph look
+  theme(
+    panel.background = element_rect(fill = 'white'),
+    panel.grid.major = element_line(
+      size = 0.25,
+      linetype = 'solid',
+      colour = 'lightgrey'
+    ),
+    panel.grid.minor = element_line(
+      size = 0.1,
+      linetype = 'solid',
+      colour = 'lightgrey'
+    ),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12)
+  )
+
+graph
+```
+
+The scatterplot was produced using the ggplot2 library. The data in the csv file was read using read.csv function. The aesthetic mapping was made using aes() the x-axis was chosen as var_a, y-axis as var_b. Factors like colour, shape and alpha(transparency) were used to differentiate the country. The shape were chosen to be hollow so that the points behind it would be visible, also alpha and the colours values were adjusted to make the points comprehensible and visually appealing.
+The title of the graph, breaks in the axis, x-axis label and y-axis label were also changed. Finally, a theme layer was added to change the default graph design, the background was made to white, the intensity and colour of the major and minor grids, and the text sizes were changed so that the graph will look good.
+
+### Data table:
+
+```{r}
+library(dplyr)
+
+#Group the rows by country and calculate mean,correlation and standard deviation
+stats <-
+  data %>% group_by(country) %>% summarize(
+    correlation = cor(var_a, var_b),
+    mean_a = mean(var_a),
+    mean_b = mean(var_b),
+    std_dev_a = sd(var_a),
+    std_dev_b = sd(var_b)
+  )
+```
+
+```{r}
+library(knitr)
+library(kableExtra)
+
+#Made table striped, change row shading when hovered, make table responsive
+#Used column_spec to make country names bolder 
+#Rounded the decimal digits to 2
+stats %>% kable(digits = 2) %>% kable_styling(
+  bootstrap_options = c("striped", "hover", "responsive"),
+  full_width = F
+) %>% column_spec(column = 1, bold = TRUE)
+```
+
+The data was grouped by country and every country's mean of var_a, var_b and standard deviation of var_a and var_b was calculated. The correlation between the var_a and var_b for each country was also calculated. The table was made so that the alternate rows in different shades and when you hover the rows it is highlighted(this only works in html and not pdf documents). The decimal digits were rounded to two digits so that there are not too many digits which makes it easy to read.
+
+## Comparison Data table and scatter plot:
+
+The data table had useful insights like the mean and standard deviation of the var_a and var_b of all the countries were nearly the same but the correlation column was not that useful. The correlation coefficient tells us that the correlation between the variables in all the countries are same, that is they are linearly related. But as we can see in the graph not all countries has a linear relationship between these variables. Ireland's var_a and var_b is like a quadratic curve also the coefficient doesnot reflect the direction of the relationship for England, Ireland and Scotland the var_b is increasing with the increase in var_a but for Wales it is nearly a constant relation. We can also easily find the outliers in the graph which will not that easy if we scan through the values of the actual table.
+
+### Appendix:
+
+```{r echo=TRUE, results='hide', message=FALSE, warning=FALSE, paged.print=FALSE}
+library(ggplot2)
+#Read the giveb csv file
+data <- read.csv('./week2_data_4cat.csv')
+#Data and aesthetic layers, aesthetic mapping
+graph <-
+  ggplot(data,
+         aes(
+           x = var_a,
+           y = var_b,
+           colour = country,
+           shape = country,
+           alpha = country
+         )) +
+  
+  #made the points bigger using size and bolder using stroke
+  geom_point(size = 2, stroke = 0.8) +
+  
+  #Assigned colours,alpha and shapes manually
+  scale_colour_manual(values = c('red', 'darkgreen', 'mediumblue', 'deeppink4')) +
+  scale_alpha_manual(values = c(0.8, 1, 0.6, 0.8)) +
+  scale_shape_manual(values = c(2, 0, 8, 1)) +
+  
+  #Given plot title and changed default axis labels
+  ggtitle('Performance of countries') +
+  xlab('a values') +
+  ylab('b values') +
+  
+  #Changing default breaks to make it comprehensible and visually appealing
+  scale_x_continuous(breaks = c(6, 10, 14, 18)) +
+  
+  #Adding theme layer to change the graph look
+  theme(
+    panel.background = element_rect(fill = 'white'),
+    panel.grid.major = element_line(
+      size = 0.25,
+      linetype = 'solid',
+      colour = 'lightgrey'
+    ),
+    panel.grid.minor = element_line(
+      size = 0.1,
+      linetype = 'solid',
+      colour = 'lightgrey'
+    ),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12)
+  )
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
+library(dplyr)
+
+#Group the rows by country and calculate mean,correlation and standard deviation
+stats <-
+  data %>% group_by(country) %>% summarize(
+    correlation = cor(var_a, var_b),
+    mean_a = mean(var_a),
+    mean_b = mean(var_b),
+    std_dev_a = sd(var_a),
+    std_dev_b = sd(var_b)
+  )
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
+library(knitr)
+library(kableExtra)
+
+#Made table striped, change row shading when hovered, make table responsive
+#Used column_spec to make country names bolder 
+#Rounded the decimal digits to 2
+stats %>% kable(digits = 2) %>% kable_styling(
+  bootstrap_options = c("striped", "hover", "responsive"),
+  full_width = F
+) %>% column_spec(column = 1, bold = TRUE)
+```
+ 
